@@ -1,0 +1,85 @@
+package com.classproject.alertapp
+
+import android.content.ContentValues
+import android.content.Context
+import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+
+class Database(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION)
+{
+
+    companion object
+    {
+        private const val DATABASE_VERSION = 1
+        private const val DATABASE_NAME = "contactData"
+        private const val TABLE_NAME = "contacts"
+        private const val KEY_ID = "id"
+        private const val NAME = "Name"
+        private const val PHONENO = "PhoneNo"
+    }
+
+    override fun onCreate(db: SQLiteDatabase)
+    {
+        val CREATE_COUNTRY_TABLE = "CREATE TABLE $TABLE_NAME(" +
+                "$KEY_ID INTEGER PRIMARY KEY," +
+                "$NAME TEXT," +
+                "$PHONENO TEXT" +
+                ")"
+        db.execSQL(CREATE_COUNTRY_TABLE)
+    }
+
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int)
+    {
+        // Handle database upgrades if needed
+    }
+
+    fun addContact(contact: Contacts)
+    {
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put(NAME, contact.name)
+        values.put(PHONENO, contact.phoneNo)
+        db.insert(TABLE_NAME, null, values)
+        db.close()
+    }
+
+    fun getAllContacts(): List<Contacts>
+    {
+        val list = mutableListOf<Contacts>()
+        val query = "SELECT * FROM $TABLE_NAME"
+        val db = this.readableDatabase
+        val cursor: Cursor = db.rawQuery(query, null)
+        if (cursor.moveToFirst())
+        {
+            do
+            {
+                list.add(Contacts(cursor.getInt(0), cursor.getString(1), cursor.getString(2)))
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return list
+    }
+
+    fun count(): Int
+    {
+        var count = 0
+        val query = "SELECT COUNT(*) FROM $TABLE_NAME"
+        val db = this.readableDatabase
+        val cursor: Cursor = db.rawQuery(query, null)
+        if (cursor.count > 0)
+        {
+            cursor.moveToFirst()
+            count = cursor.getInt(0)
+        }
+        cursor.close()
+        return count
+    }
+
+    fun deleteContact(contact: Contacts)
+    {
+        val db = this.writableDatabase
+        db.delete(TABLE_NAME, "$KEY_ID = ?", arrayOf(contact.id.toString()))
+        db.close()
+    }
+}

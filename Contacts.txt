@@ -1,0 +1,60 @@
+package com.classproject.alertapp
+
+class Contacts(public var id: Int, public var phoneNo: String, public var name: String)
+{
+
+    init
+    {
+        this.phoneNo = validate(phoneNo)
+    }
+
+    private fun validate(phone: String): String
+    {
+        val case1 = StringBuilder("+911")
+        val case2 = StringBuilder("")
+
+        if (phone[0] != '+')
+        {
+            for (i in phone.indices)
+            {
+                if (phone[i] != '-' && phone[i] != ' ')
+                {
+                    case1.append(phone[i])
+                }
+            }
+            return case1.toString()
+        }
+
+        else
+        {
+            for (i in phone.indices)
+            {
+                if (phone[i] != '-' || phone[i] != ' ')
+                {
+                    case2.append(phone[i])
+                }
+            }
+            return case2.toString()
+        }
+    }
+
+    fun getPhoneNo(): String
+    {
+        return phoneNo
+    }
+
+    fun getId(): Int
+    {
+        return id
+    }
+
+    fun getName(): String
+    {
+        return name
+    }
+
+    fun setName(name: String)
+    {
+        this.name = name
+    }
+}
